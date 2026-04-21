@@ -21,3 +21,11 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+.aws/**/*
+.gitconfig
+.cache/**/*
+.dotnet/**/*
+.bash_history
+.npm/**/*
+.ssh/known_hosts
+.vscode-server/**/*
