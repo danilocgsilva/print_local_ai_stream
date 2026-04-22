@@ -22,11 +22,13 @@
           : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
       <button
-        class="w-full py-2 rounded-lg transition-colors"
+        @click="ask"
+        :disabled="loading"
+        class="w-full py-2 rounded-lg transition-colors disabled:opacity-50"
         :class="isDark
           ? 'bg-dark-muted text-dark-subtle hover:bg-dark-border'
           : 'bg-light-subtle text-gray-800 hover:bg-light-muted'"
-      >Ask</button>
+      >{{ loading ? 'Asking...' : 'Ask' }}</button>
       <textarea
         :value="outputText"
         readonly
@@ -47,5 +49,40 @@ export default class Index extends Vue {
   inputText = '';
   outputText = '';
   isDark = false;
+  loading = false;
+
+  async ask(): Promise<void> {
+    if (!this.inputText.trim() || this.loading) return;
+    this.loading = true;
+    this.outputText = '';
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        model: 'gemma3:4b', 
+        prompt: this.inputText, 
+        stream: true 
+      }),
+    });
+
+    if (!response.body) return;
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    let done = false;
+    while (!done) {
+      const { done: isDone, value } = await reader.read();
+      done = isDone;
+
+      const listOfData = decoder.decode(value).split('\n').filter(Boolean);
+      for (const line of listOfData) {
+        const chunk = JSON.parse(line);
+        this.outputText += chunk.response ?? '';
+      }
+    }
+
+    this.loading = false;
+  }
 }
 </script>
