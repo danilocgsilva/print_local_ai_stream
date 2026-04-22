@@ -5,7 +5,26 @@
   >
     <div class="flex flex-col gap-4 p-12 max-w-5xl mx-auto w-full">
       <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Ollama Chat</h1>
-      <div class="flex justify-end">
+      <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
+        Put a question and ask. It will access the local Ollama server to answer.
+      </p>
+      <div class="flex justify-end items-center gap-2">
+        <input
+          v-model="serverDns"
+          class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
+          :class="isDark
+            ? 'bg-dark-surface text-dark-subtle border-dark-border'
+            : 'bg-light-surface text-gray-700 border-light-strong'"
+        />
+        <select
+          v-model="selectedModel"
+          class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
+          :class="isDark
+            ? 'bg-dark-surface text-dark-subtle border-dark-border'
+            : 'bg-light-surface text-gray-700 border-light-strong'"
+        >
+          <option v-for="model in models" :key="model" :value="model">{{ model }}</option>
+        </select>
         <button
           @click="toggleTheme"
           class="px-4 py-1.5 rounded-lg text-sm border transition-colors"
@@ -52,6 +71,16 @@ export default class Index extends Vue {
   outputText = '';
   isDark = document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark';
   loading = false;
+  serverDns = 'localhost:11434';
+  selectedModel = '';
+  models: string[] = [];
+
+  async mounted(): Promise<void> {
+    const res = await fetch(`http://${this.serverDns}/api/tags`);
+    const data = await res.json();
+    this.models = data.models.map((m: { name: string }) => m.name);
+    this.selectedModel = this.models[0] ?? '';
+  }
 
   toggleTheme(): void {
     this.isDark = !this.isDark;
@@ -63,11 +92,11 @@ export default class Index extends Vue {
     this.loading = true;
     this.outputText = '';
 
-    const response = await fetch('http://localhost:11434/api/generate', {
+    const response = await fetch(`http://${this.serverDns}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        model: 'gemma3:4b', 
+        model: this.selectedModel, 
         prompt: this.inputText, 
         stream: true 
       }),
