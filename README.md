@@ -1,24 +1,14 @@
-# app
+# Print local AI stream
 
-## Project setup
-```
-npm install
-```
+To run the project:
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+* Have the Ollama server installed locally, or at least have its api acessible: https://ollama.com/download
+* Download at least one model to teh Ollama. If you have none in mind, I recommend `gemma3:4b`, as it have a descent quality and still lightweight.
+* Docker also need to be installed in the computer.
 
-### Compiles and minifies for production
+Then, just build with the command:
 ```
-npm run build
+docker compose up -d --build
 ```
+After it is completely compiled, you can access `http://localhost:8080` and try.
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
