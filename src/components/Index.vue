@@ -4,9 +4,10 @@
     :class="isDark ? 'bg-dark-bg' : 'bg-light-bg'"
   >
     <div class="flex flex-col gap-4 p-12 max-w-5xl mx-auto w-full">
+      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Ollama Chat</h1>
       <div class="flex justify-end">
         <button
-          @click="isDark = !isDark"
+          @click="toggleTheme"
           class="px-4 py-1.5 rounded-lg text-sm border transition-colors"
           :class="isDark
             ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
@@ -43,13 +44,19 @@
 </template>
 
 <script lang="ts">
+import { h } from 'vue';
 import { Vue } from 'vue-class-component';
 
 export default class Index extends Vue {
   inputText = '';
   outputText = '';
-  isDark = false;
+  isDark = document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark';
   loading = false;
+
+  toggleTheme(): void {
+    this.isDark = !this.isDark;
+    document.cookie = `theme=${this.isDark ? 'dark' : 'light'}; path=/`;
+  }
 
   async ask(): Promise<void> {
     if (!this.inputText.trim() || this.loading) return;
