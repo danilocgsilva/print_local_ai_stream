@@ -92,7 +92,7 @@ const inputText = ref('');
 const outputText = ref('');
 const isDark = ref(document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark');
 const loading = ref(false);
-const serverDns = ref('localhost:11434');
+const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref('');
@@ -112,7 +112,8 @@ async function fetchModels(): Promise<void> {
 onMounted(fetchModels);
 
 let dnsDebounce: ReturnType<typeof setTimeout>;
-watch(serverDns, () => {
+watch(serverDns, (val) => {
+  localStorage.setItem('serverDns', val);
   clearTimeout(dnsDebounce);
   dnsDebounce = setTimeout(fetchModels, 3000);
 });
