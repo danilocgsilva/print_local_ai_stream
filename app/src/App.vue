@@ -1,14 +1,14 @@
 <template>
-  <Index />
+  <IndexComponent />
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import Index from './components/Index.vue';
+import IndexComponent from './components/IndexComponent.vue';
 
 @Options({
   components: {
-    Index,
+    IndexComponent,
   },
 })
 export default class App extends Vue {}
