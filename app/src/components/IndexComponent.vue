@@ -105,6 +105,8 @@ async function fetchModels(): Promise<void> {
     selectedModel.value = models.value[0] ?? '';
     modelsError.value = '';
   } catch {
+    models.value = [];
+    selectedModel.value = '';
     modelsError.value = `Could not reach Ollama at ${serverDns.value}. Make sure the server is running.`;
   }
 }
