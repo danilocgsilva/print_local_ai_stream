@@ -4,34 +4,42 @@
     :class="isDark ? 'bg-dark-bg' : 'bg-light-bg'"
   >
     <div class="flex flex-col gap-4 p-12 max-w-5xl mx-auto w-full">
-      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Ollama Chat</h1>
-      <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
-        Put a question and ask. It will access the local Ollama server to answer.
-      </p>
-      <div class="flex justify-end items-center gap-2">
-        <input
-          v-model="serverDns"
-          class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
-          :class="isDark
-            ? 'bg-dark-surface text-dark-subtle border-dark-border'
-            : 'bg-light-surface text-gray-700 border-light-strong'"
-        />
-        <select
-          v-model="selectedModel"
-          class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
-          :class="isDark
-            ? 'bg-dark-surface text-dark-subtle border-dark-border'
-            : 'bg-light-surface text-gray-700 border-light-strong'"
-        >
-          <option v-for="model in models" :key="model" :value="model">{{ model }}</option>
-        </select>
+      <div class="flex justify-end">
         <button
           @click="toggleTheme"
-          class="px-4 py-1.5 rounded-lg text-sm border transition-colors"
+          class="w-24 shrink-0 py-1.5 rounded-lg text-sm border transition-colors"
           :class="isDark
             ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
             : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
         >{{ isDark ? '☀ Light' : '☾ Dark' }}</button>
+      </div>
+      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Ollama Chat</h1>
+      <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
+        Put a question and ask. It will access the local Ollama server to answer.
+      </p>
+      <div class="flex items-end gap-2">
+        <label class="flex-1 min-w-0 flex flex-col gap-1">
+          <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Server DNS</span>
+          <input
+            v-model="serverDns"
+            class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
+            :class="isDark
+              ? 'bg-dark-surface text-dark-subtle border-dark-border'
+              : 'bg-light-surface text-gray-700 border-light-strong'"
+          />
+        </label>
+        <label class="flex-1 min-w-0 flex flex-col gap-1">
+          <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Model</span>
+          <select
+            v-model="selectedModel"
+            class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
+            :class="isDark
+              ? 'bg-dark-surface text-dark-subtle border-dark-border'
+              : 'bg-light-surface text-gray-700 border-light-strong'"
+          >
+            <option v-for="model in models" :key="model" :value="model">{{ model }}</option>
+          </select>
+        </label>
       </div>
       <textarea
         v-model="inputText"
