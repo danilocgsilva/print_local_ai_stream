@@ -55,7 +55,7 @@
         v-model="inputText"
         :readonly="!!modelsError || models.length === 0"
         placeholder="Type here..."
-        class="w-full h-40 p-3 rounded-lg border resize-none focus:outline-none focus:ring-2 transition-colors"
+        class="w-full h-60 min-h-40 p-3 rounded-lg border resize-y focus:outline-none focus:ring-2 transition-colors"
         :class="!!modelsError || models.length === 0
           ? isDark
             ? 'bg-dark-bg text-dark-subtle border-dark-border cursor-default placeholder-dark-subtle'
