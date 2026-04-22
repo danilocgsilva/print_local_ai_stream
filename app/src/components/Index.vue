@@ -32,7 +32,7 @@
           <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Model</span>
           <select
             v-model="selectedModel"
-            class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none"
+            class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none h-[34px]"
             :class="isDark
               ? 'bg-dark-surface text-dark-subtle border-dark-border'
               : 'bg-light-surface text-gray-700 border-light-strong'"
@@ -41,13 +41,28 @@
           </select>
         </label>
       </div>
+      <div
+        v-if="modelsError"
+        class="flex items-start gap-2 px-3 py-2 rounded-lg border text-sm"
+        :class="isDark
+          ? 'bg-red-950 text-red-400 border-red-800'
+          : 'bg-red-50 text-red-600 border-red-200'"
+      >
+        <span>⚠</span>
+        <span>{{ modelsError }}</span>
+      </div>
       <textarea
         v-model="inputText"
+        :readonly="!!modelsError || models.length === 0"
         placeholder="Type here..."
         class="w-full h-40 p-3 rounded-lg border resize-none focus:outline-none focus:ring-2 transition-colors"
-        :class="isDark
-          ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
-          : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
+        :class="!!modelsError || models.length === 0
+          ? isDark
+            ? 'bg-dark-bg text-dark-subtle border-dark-border cursor-default placeholder-dark-subtle'
+            : 'bg-light-surface text-gray-500 border-light-strong cursor-default placeholder-light-subtle'
+          : isDark
+            ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
+            : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
       <button
         @click="ask"
@@ -70,63 +85,74 @@
   </div>
 </template>
 
-<script lang="ts">
-import { h } from 'vue';
-import { Vue } from 'vue-class-component';
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
 
-export default class Index extends Vue {
-  inputText = '';
-  outputText = '';
-  isDark = document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark';
-  loading = false;
-  serverDns = 'localhost:11434';
-  selectedModel = '';
-  models: string[] = [];
+const inputText = ref('');
+const outputText = ref('');
+const isDark = ref(document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark');
+const loading = ref(false);
+const serverDns = ref('localhost:11434');
+const selectedModel = ref('');
+const models = ref<string[]>([]);
+const modelsError = ref('');
 
-  async mounted(): Promise<void> {
-    const res = await fetch(`http://${this.serverDns}/api/tags`);
+async function fetchModels(): Promise<void> {
+  try {
+    const res = await fetch(`http://${serverDns.value}/api/tags`);
     const data = await res.json();
-    this.models = data.models.map((m: { name: string }) => m.name);
-    this.selectedModel = this.models[0] ?? '';
+    models.value = data.models.map((m: { name: string }) => m.name);
+    selectedModel.value = models.value[0] ?? '';
+    modelsError.value = '';
+  } catch {
+    modelsError.value = `Could not reach Ollama at ${serverDns.value}. Make sure the server is running.`;
   }
+}
 
-  toggleTheme(): void {
-    this.isDark = !this.isDark;
-    document.cookie = `theme=${this.isDark ? 'dark' : 'light'}; path=/`;
-  }
+onMounted(fetchModels);
 
-  async ask(): Promise<void> {
-    if (!this.inputText.trim() || this.loading) return;
-    this.loading = true;
-    this.outputText = '';
+let dnsDebounce: ReturnType<typeof setTimeout>;
+watch(serverDns, () => {
+  clearTimeout(dnsDebounce);
+  dnsDebounce = setTimeout(fetchModels, 3000);
+});
 
-    const response = await fetch(`http://${this.serverDns}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        model: this.selectedModel, 
-        prompt: this.inputText, 
-        stream: true 
-      }),
-    });
+function toggleTheme(): void {
+  isDark.value = !isDark.value;
+  document.cookie = `theme=${isDark.value ? 'dark' : 'light'}; path=/`;
+}
 
-    if (!response.body) return;
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+async function ask(): Promise<void> {
+  if (!inputText.value.trim() || loading.value) return;
+  loading.value = true;
+  outputText.value = '';
 
-    let done = false;
-    while (!done) {
-      const { done: isDone, value } = await reader.read();
-      done = isDone;
+  const response = await fetch(`http://${serverDns.value}/api/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      model: selectedModel.value, 
+      prompt: inputText.value, 
+      stream: true 
+    }),
+  });
 
-      const listOfData = decoder.decode(value).split('\n').filter(Boolean);
-      for (const line of listOfData) {
-        const chunk = JSON.parse(line);
-        this.outputText += chunk.response ?? '';
-      }
+  if (!response.body) return;
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  let done = false;
+  while (!done) {
+    const { done: isDone, value } = await reader.read();
+    done = isDone;
+
+    const listOfData = decoder.decode(value).split('\n').filter(Boolean);
+    for (const line of listOfData) {
+      const chunk = JSON.parse(line);
+      outputText.value += chunk.response ?? '';
     }
-
-    this.loading = false;
   }
+
+  loading.value = false;
 }
 </script>
