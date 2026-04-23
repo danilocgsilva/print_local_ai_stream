@@ -109,13 +109,13 @@ const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref('');
-let abortController: AbortController | null = null;
 
 const ollama = new OllamaData(serverDns.value);
-const ollamClient = new OllamaClient(serverDns.value);
+const ollamClient = new OllamaClient(ollama);
 
 async function fetchModels(): Promise<void> {
   try {
+    ollamClient.updateHostAndDns(serverDns.value);
     models.value = await ollamClient.getModels();
     selectedModel.value = models.value[0] ?? '';
     modelsError.value = '';
@@ -141,24 +141,16 @@ function toggleTheme(): void {
 }
 
 function cancel(): void {
-  abortController?.abort();
+  ollamClient.abort();
 }
 
 async function ask(): Promise<void> {
   if (!inputText.value.trim() || loading.value) return;
   loading.value = true;
   outputText.value = '';
-  abortController = new AbortController();
 
   try {
-    const response = await fetch(ollama.getFullAddressGenerate(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(
-        ollama.getQueryObject(selectedModel.value, inputText.value)
-      ),
-      signal: abortController.signal,
-    });
+    const response = await ollamClient.getResponse(selectedModel.value, inputText.value);
 
     if (!response.body) return;
     const reader = response.body.getReader();
@@ -179,7 +171,7 @@ async function ask(): Promise<void> {
     if ((e as Error).name !== 'AbortError') throw e;
   } finally {
     loading.value = false;
-    abortController = null;
+    ollamClient.cleanAbord()
   }
 }
 </script>

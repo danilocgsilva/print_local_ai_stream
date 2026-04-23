@@ -21,6 +21,11 @@ class OllamaData {
         return `http://${this.serverDns}/${this.tagsPath}`;
     }
 
+    public updateServerDns(serverDns: string): OllamaData {
+        this.serverDns = serverDns;
+        return this;
+    }
+
     public getQueryObject(model: string, prompt: string): any {
         return { 
             model: model, 
