@@ -64,14 +64,25 @@
             ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
             : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
-      <button
-        @click="ask"
-        :disabled="loading"
-        class="w-full py-2 rounded-lg transition-colors disabled:opacity-50"
-        :class="isDark
-          ? 'bg-dark-muted text-dark-subtle hover:bg-dark-border'
-          : 'bg-light-subtle text-gray-800 hover:bg-light-muted'"
-      >{{ loading ? 'Asking...' : 'Ask' }}</button>
+      <div class="flex gap-2">
+        <button
+          @click="ask"
+          :disabled="loading"
+          class="flex-1 py-2 rounded-lg transition-colors disabled:opacity-50"
+          :class="isDark
+            ? 'bg-dark-muted text-dark-subtle hover:bg-dark-border'
+            : 'bg-light-subtle text-gray-800 hover:bg-light-muted'"
+        >{{ loading ? 'Asking...' : 'Ask' }}</button>
+        <button
+          @click="cancel"
+          :disabled="!loading"
+          title="Cancel the current request"
+          class="px-3 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="isDark
+            ? 'bg-dark-surface text-red-400 border border-red-800 hover:bg-red-950'
+            : 'bg-light-surface text-red-600 border border-red-200 hover:bg-red-50'"
+        >✕</button>
+      </div>
       <textarea
         :value="outputText"
         readonly
@@ -96,6 +107,7 @@ const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref('');
+let abortController: AbortController | null = null;
 
 async function fetchModels(): Promise<void> {
   try {
@@ -125,37 +137,48 @@ function toggleTheme(): void {
   document.cookie = `theme=${isDark.value ? 'dark' : 'light'}; path=/`;
 }
 
+function cancel(): void {
+  abortController?.abort();
+}
+
 async function ask(): Promise<void> {
   if (!inputText.value.trim() || loading.value) return;
   loading.value = true;
   outputText.value = '';
+  abortController = new AbortController();
 
-  const response = await fetch(`http://${serverDns.value}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      model: selectedModel.value, 
-      prompt: inputText.value, 
-      stream: true 
-    }),
-  });
+  try {
+    const response = await fetch(`http://${serverDns.value}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        model: selectedModel.value, 
+        prompt: inputText.value, 
+        stream: true 
+      }),
+      signal: abortController.signal,
+    });
 
-  if (!response.body) return;
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+    if (!response.body) return;
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
-  let done = false;
-  while (!done) {
-    const { done: isDone, value } = await reader.read();
-    done = isDone;
+    let done = false;
+    while (!done) {
+      const { done: isDone, value } = await reader.read();
+      done = isDone;
 
-    const listOfData = decoder.decode(value).split('\n').filter(Boolean);
-    for (const line of listOfData) {
-      const chunk = JSON.parse(line);
-      outputText.value += chunk.response ?? '';
+      const listOfData = decoder.decode(value).split('\n').filter(Boolean);
+      for (const line of listOfData) {
+        const chunk = JSON.parse(line);
+        outputText.value += chunk.response ?? '';
+      }
     }
+  } catch (e: unknown) {
+    if ((e as Error).name !== 'AbortError') throw e;
+  } finally {
+    loading.value = false;
+    abortController = null;
   }
-
-  loading.value = false;
 }
 </script>
