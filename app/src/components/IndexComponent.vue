@@ -98,6 +98,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
+import OllamaData from '../OllamaData';
+import OllamaClient from '@/OllamaClient';
 
 const inputText = ref('');
 const outputText = ref('');
@@ -109,17 +111,18 @@ const models = ref<string[]>([]);
 const modelsError = ref('');
 let abortController: AbortController | null = null;
 
+const ollama = new OllamaData(serverDns.value);
+const ollamClient = new OllamaClient(serverDns.value);
+
 async function fetchModels(): Promise<void> {
   try {
-    const res = await fetch(`http://${serverDns.value}/api/tags`);
-    const data = await res.json();
-    models.value = data.models.map((m: { name: string }) => m.name);
+    models.value = await ollamClient.getModels();
     selectedModel.value = models.value[0] ?? '';
     modelsError.value = '';
   } catch {
     models.value = [];
     selectedModel.value = '';
-    modelsError.value = `Could not reach Ollama at ${serverDns.value}. Make sure the server is running.`;
+    modelsError.value = `Could not reach Ollama at ${ollama.getDnsAndPort()}. Make sure the server is running.`;
   }
 }
 
@@ -148,14 +151,12 @@ async function ask(): Promise<void> {
   abortController = new AbortController();
 
   try {
-    const response = await fetch(`http://${serverDns.value}/api/generate`, {
+    const response = await fetch(ollama.getFullAddressGenerate(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        model: selectedModel.value, 
-        prompt: inputText.value, 
-        stream: true 
-      }),
+      body: JSON.stringify(
+        ollama.getQueryObject(selectedModel.value, inputText.value)
+      ),
       signal: abortController.signal,
     });
 
