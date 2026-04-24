@@ -26,7 +26,7 @@ class OllamaData {
         return this;
     }
 
-    public getQueryObject(model: string, prompt: string): any {
+    public getQueryObject(model: string, prompt: string): Record<string, unknown> {
         return { 
             model: model, 
             prompt: prompt, 
