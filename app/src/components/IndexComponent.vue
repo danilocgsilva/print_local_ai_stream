@@ -114,7 +114,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import OllamaData from '../OllamaData';
-import OllamaClient from '@/OllamaClient';
+import OllamaClient from '../OllamaClient';
 
 const inputText = ref('');
 const outputText = ref('');
@@ -123,7 +123,7 @@ const loading = ref(false);
 const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
-const modelsError = ref('');
+const modelsError = ref<string | null>(null);
 const showSettings = ref(false);
 
 const ollama = new OllamaData(serverDns.value);
