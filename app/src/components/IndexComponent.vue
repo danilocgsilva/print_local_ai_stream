@@ -64,6 +64,21 @@
             ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
             : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
+      <div class="overflow-hidden transition-all duration-300 ease-in-out"
+        :style="showSettings ? 'max-height: 500px; opacity: 1' : 'max-height: 0; opacity: 0'"
+      >
+        <div class="rounded-lg border p-3 mb-4"
+          :class="isDark ? 'border-dark-border bg-dark-surface' : 'border-light-strong bg-light-surface'"
+        >
+        </div>
+      </div>
+      <button
+        @click="toggleSettings"
+        class="w-full py-1.5 rounded-lg text-sm border transition-colors"
+        :class="isDark
+          ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
+          : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
+      >{{ showSettings ? '▲ Settings' : '▼ Settings' }}</button>
       <div class="flex gap-2">
         <button
           @click="ask"
@@ -109,6 +124,7 @@ const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref('');
+const showSettings = ref(false);
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
@@ -134,6 +150,10 @@ watch(serverDns, (val) => {
   clearTimeout(dnsDebounce);
   dnsDebounce = setTimeout(fetchModels, 3000);
 });
+
+function toggleSettings(): void {
+  showSettings.value = !showSettings.value;
+}
 
 function toggleTheme(): void {
   isDark.value = !isDark.value;
