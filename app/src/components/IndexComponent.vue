@@ -69,9 +69,9 @@
       >
         <div class="rounded-lg border p-3 mb-4"
           :class="isDark ? 'border-dark-border bg-dark-surface' : 'border-light-strong bg-light-surface'"
-        >
-        </div>
+        ></div>
       </div>
+
       <button
         @click="toggleSettings"
         class="w-full py-1.5 rounded-lg text-sm border transition-colors"
