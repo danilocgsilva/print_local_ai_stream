@@ -28,18 +28,20 @@
               : 'bg-light-surface text-gray-700 border-light-strong'"
           />
         </label>
-        <label class="flex-1 min-w-0 flex flex-col gap-1">
+        <div class="flex-1 min-w-0 flex flex-col gap-1">
           <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Model</span>
           <select
             v-model="selectedModel"
-            class="px-3 py-1.5 rounded-lg text-sm border transition-colors focus:outline-none h-[34px]"
+            class="px-3 py-1.5 pr-8 rounded-lg text-sm border transition-colors focus:outline-none appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:1rem]"
             :class="isDark
               ? 'bg-dark-surface text-dark-subtle border-dark-border'
               : 'bg-light-surface text-gray-700 border-light-strong'"
+            :style="{ backgroundImage: arrowSvg }"
           >
+            <option value="" disabled>{{ modelsError ? 'Unavailable' : models.length === 0 ? 'Loading...' : '' }}</option>
             <option v-for="model in models" :key="model" :value="model">{{ model }}</option>
           </select>
-        </label>
+        </div>
       </div>
       <div
         v-if="modelsError"
@@ -115,6 +117,8 @@
 import { ref, onMounted, watch } from 'vue';
 import OllamaData from '../OllamaData';
 import OllamaClient from '../OllamaClient';
+
+const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`;
 
 const inputText = ref('');
 const outputText = ref('');

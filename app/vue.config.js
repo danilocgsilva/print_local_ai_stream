@@ -6,9 +6,9 @@ module.exports = defineConfig({
     webSocketServer: 'ws',
     client: {
       webSocketURL: {
-        hostname: '0.0.0.0',
+        hostname: 'localhost',
         pathname: '/ws',
-        port: 8080,
+        port: parseInt(process.env.PORT) || 8081,
         protocol: 'ws',
       },
     },
