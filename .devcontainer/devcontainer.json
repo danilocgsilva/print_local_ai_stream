@@ -1,0 +1,6 @@
+{
+    "name": "print_local_ai_stream",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "print_stream_local_ollama",
+    "workspaceFolder": "/app"
+}
