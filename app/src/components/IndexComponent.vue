@@ -66,21 +66,7 @@
             ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
             : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
-      <div class="overflow-hidden transition-all duration-300 ease-in-out"
-        :style="showSettings ? 'max-height: 500px; opacity: 1' : 'max-height: 0; opacity: 0'"
-      >
-        <div class="rounded-lg border p-3 mb-4"
-          :class="isDark ? 'border-dark-border bg-dark-surface' : 'border-light-strong bg-light-surface'"
-        ></div>
-      </div>
-
-      <button
-        @click="toggleSettings"
-        class="w-full py-1.5 rounded-lg text-sm border transition-colors"
-        :class="isDark
-          ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
-          : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
-      >{{ showSettings ? '▲ Settings' : '▼ Settings' }}</button>
+      <SettingsComponent :isDark="isDark" :show="showSettings" :mode="apiMode" @toggle="toggleSettings" @update:mode="apiMode = $event" />
       <div class="flex gap-2">
         <button
           @click="ask"
@@ -117,6 +103,8 @@
 import { ref, onMounted, watch } from 'vue';
 import OllamaData from '../OllamaData';
 import OllamaClient from '../OllamaClient';
+import SettingsComponent from './SettingsComponent.vue';
+import { ApiMode } from '../OllamaData';
 
 const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`;
 
@@ -129,6 +117,7 @@ const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
 const showSettings = ref(false);
+const apiMode = ref<ApiMode>('chat');
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
@@ -174,7 +163,7 @@ async function ask(): Promise<void> {
   outputText.value = '';
 
   try {
-    const response = await ollamClient.getResponse(selectedModel.value, inputText.value);
+    const response = await ollamClient.getResponse(apiMode.value, selectedModel.value, inputText.value);
 
     if (!response.body) return;
     const reader = response.body.getReader();
@@ -188,7 +177,7 @@ async function ask(): Promise<void> {
       const listOfData = decoder.decode(value).split('\n').filter(Boolean);
       for (const line of listOfData) {
         const chunk = JSON.parse(line);
-        outputText.value += chunk.response ?? '';
+        outputText.value += chunk.message?.content ?? chunk.response ?? '';
       }
     }
   } catch (e: unknown) {

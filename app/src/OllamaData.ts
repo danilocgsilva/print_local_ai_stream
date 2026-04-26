@@ -1,20 +1,21 @@
+export type ApiMode = 'chat' | 'generate';
+
 class OllamaData {
     private serverDns: string;
-    private generatePath: string;
-    private tagsPath: string;
+    private generatePath = 'api/generate';
+    private chatPath = 'api/chat';
+    private tagsPath = 'api/tags';
 
     constructor(serverDns: string) {
         this.serverDns = serverDns;
-        this.generatePath = "api/generate";
-        this.tagsPath = "api/tags";
     }
 
     public getDnsAndPort(): string {
         return this.serverDns;
     }
 
-    public getFullAddressGenerate(): string {
-        return `http://${this.serverDns}/${this.generatePath}`;
+    public getFullAddress(mode: ApiMode): string {
+        return `http://${this.serverDns}/${mode === 'chat' ? this.chatPath : this.generatePath}`;
     }
 
     public getFullAddressTags(): string {
@@ -26,12 +27,14 @@ class OllamaData {
         return this;
     }
 
-    public getQueryObject(model: string, prompt: string): Record<string, unknown> {
-        return { 
-            model: model, 
-            prompt: prompt, 
-            stream: true 
+    public getQueryObject(mode: ApiMode, model: string, prompt: string): Record<string, unknown> {
+        if (mode === 'chat') {
+            return { model, messages: [{ role: 'user', content: prompt }], stream: true };
         }
+        if (mode === 'generate') {
+            return { model, prompt, stream: true };
+        }
+        throw new Error("Wrong mode given.");
     }
 }
 
