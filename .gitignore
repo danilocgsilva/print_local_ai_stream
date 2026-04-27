@@ -2,3 +2,4 @@ app/.local/**/*
 app/.vscodium-server/**/*
 app/.wget-hsts
 app/.env
+.env
