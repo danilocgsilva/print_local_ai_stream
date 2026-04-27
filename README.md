@@ -12,7 +12,7 @@ docker compose up -d --build
 ```
 After it is completely compiled, you can access `http://localhost:8099` and try.
 
-**Note**: You can customize the port where to run the server copying `app/.env.example` into `app/.env` and setting a specific port other than the default - which is 8099.
+**Note**: You can customize the port where to run the server copying `app/.env.example` into `app/.env` and `.env.example` into `.env` and setting a specific port other than the default - which is 8099.
 
 ## What you will found here
 
