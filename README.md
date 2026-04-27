@@ -10,6 +10,20 @@ Then, just build with the command:
 ```
 docker compose up -d --build
 ```
-After it is completely compiled, you can access `http://localhost:8080` and try.
+After it is completely compiled, you can access `http://localhost:8099` and try.
 
-**Note**: You can customize the port where to run the server copying `app/.env.example` into `app/.env` and setting a specific port other than the default - which is 8080.
+**Note**: You can customize the port where to run the server copying `app/.env.example` into `app/.env` and setting a specific port other than the default - which is 8099.
+
+## What you will found here
+
+* Docker receipt
+* node
+* TypeScript
+* Vue.js 3
+* Switching between light and dark theme
+* Tailwind
+* Local compilation with Vite
+* Friendly to remote development
+* DevContainer recipe
+* Ready to VS Codium
+* HMR working, even in remote machine
