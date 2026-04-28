@@ -86,6 +86,16 @@
             : 'bg-light-surface text-red-600 border border-red-200 hover:bg-red-50'"
         >✕</button>
       </div>
+      <div
+        v-if="requestError"
+        class="flex items-start gap-2 px-3 py-2 rounded-lg border text-sm"
+        :class="isDark
+          ? 'bg-red-950 text-red-400 border-red-800'
+          : 'bg-red-50 text-red-600 border-red-200'"
+      >
+        <span>⚠</span>
+        <span>{{ requestError }}</span>
+      </div>
       <textarea
         :value="outputText"
         readonly
@@ -116,6 +126,7 @@ const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
 const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
+const requestError = ref<string | null>(null);
 const showSettings = ref(false);
 const apiMode = ref<ApiMode>('chat');
 
@@ -161,10 +172,16 @@ async function ask(): Promise<void> {
   if (!inputText.value.trim() || loading.value) return;
   loading.value = true;
   outputText.value = '';
+  requestError.value = null;
 
   try {
     const response = await ollamClient.getResponse(apiMode.value, selectedModel.value, inputText.value);
 
+    if (!response.ok) {
+      const data = await response.json();
+      requestError.value = data.error ?? 'Unknown error';
+      return;
+    }
     if (!response.body) return;
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
