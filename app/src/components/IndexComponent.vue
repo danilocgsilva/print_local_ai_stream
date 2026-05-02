@@ -75,7 +75,7 @@
           :class="isDark
             ? 'bg-dark-muted text-dark-subtle hover:bg-dark-border'
             : 'bg-light-subtle text-gray-800 hover:bg-light-muted'"
-        >{{ loading ? 'Asking...' : 'Ask' }}</button>
+        >{{ loading ? 'Answering...' : 'Ask' }}</button>
         <button
           @click="cancel"
           :disabled="!loading"
@@ -85,6 +85,9 @@
             ? 'bg-dark-surface text-red-400 border border-red-800 hover:bg-red-950'
             : 'bg-light-surface text-red-600 border border-red-200 hover:bg-red-50'"
         >✕</button>
+      </div>
+      <div v-if="loading" class="w-full h-1 rounded overflow-hidden" :class="isDark ? 'bg-dark-border' : 'bg-light-muted'">
+        <div class="h-full w-1/3 rounded animate-progress" :class="isDark ? 'bg-dark-subtle' : 'bg-light-subtle'"></div>
       </div>
       <div
         v-if="requestError"

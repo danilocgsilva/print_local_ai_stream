@@ -4,6 +4,15 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      keyframes: {
+        progress: {
+          '0%':   { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(400%)' },
+        },
+      },
+      animation: {
+        progress: 'progress 1.2s linear infinite',
+      },
       colors: {
         light: {
           bg:       '#f0ebe5',
