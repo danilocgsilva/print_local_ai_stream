@@ -2,4 +2,5 @@ app/.local/**/*
 app/.vscodium-server/**/*
 app/.wget-hsts
 app/.env
+app/.gnupg/**/*
 .env

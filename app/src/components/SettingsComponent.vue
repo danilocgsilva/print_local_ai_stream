@@ -8,7 +8,6 @@
       >
         <div class="flex flex-col gap-1">
           <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">API Mode</span>
-          <hr />
           <div class="flex gap-4">
 
             <label v-for="option in (['chat', 'generate'] as ApiMode[])" :key="option" class="flex items-center gap-1.5 text-sm cursor-pointer"
@@ -21,9 +20,15 @@
             </label>
 
           </div>
-          <hr />
 
-          <textarea></textarea>
+          <textarea
+            v-model="systemPrompt"
+            placeholder="Type system prompt here..."
+            class="w-full h-24 p-3 rounded-lg border resize-y focus:outline-none focus:ring-2 transition-colors"
+            :class="isDark
+              ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
+              : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
+          ></textarea>
         </div>
       </div>
     </div>
