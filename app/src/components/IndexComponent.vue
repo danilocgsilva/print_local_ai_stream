@@ -130,7 +130,7 @@ const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
 const requestError = ref<string | null>(null);
-const showSettings = ref(false);
+const showSettings = ref(true);
 const apiMode = ref<ApiMode>('chat');
 
 const ollama = new OllamaData(serverDns.value);

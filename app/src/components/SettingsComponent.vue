@@ -8,7 +8,9 @@
       >
         <div class="flex flex-col gap-1">
           <span class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">API Mode</span>
+          <hr />
           <div class="flex gap-4">
+
             <label v-for="option in (['chat', 'generate'] as ApiMode[])" :key="option" class="flex items-center gap-1.5 text-sm cursor-pointer"
               :class="isDark ? 'text-dark-subtle' : 'text-gray-700'"
             >
@@ -17,10 +19,15 @@
               />
               {{ option }}
             </label>
+
           </div>
+          <hr />
+
+          <textarea></textarea>
         </div>
       </div>
     </div>
+
     <button
       @click="$emit('toggle')"
       class="w-full py-1.5 rounded-lg text-sm border transition-colors"
@@ -28,11 +35,16 @@
         ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
         : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
     >{{ show ? '▲ Settings' : '▼ Settings' }}</button>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ApiMode } from '../OllamaData';
+import { ref } from 'vue';
+
+const systemPrompt = ref('');
+
 defineProps<{ isDark: boolean; show: boolean; mode: ApiMode }>();
 defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void }>();
 </script>
