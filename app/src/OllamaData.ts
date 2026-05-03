@@ -1,4 +1,6 @@
 export type ApiMode = 'chat' | 'generate';
+import ChatSend from "types/ChatSend";
+import GenerateSend from "types/GenerateSend";
 
 class OllamaData {
     private serverDns: string;
@@ -27,12 +29,27 @@ class OllamaData {
         return this;
     }
 
-    public getQueryObject(mode: ApiMode, model: string, prompt: string): Record<string, unknown> {
+    public getQueryObject(
+        mode: ApiMode, 
+        model: string, 
+        prompt: string,
+        systemPrompt = ""
+    ): ChatSend | GenerateSend {
+        const messages = []
+        if (systemPrompt !== "") {
+            messages.push({ role: 'system', content: systemPrompt });    
+        }
+        messages.push({ role: 'user', content: prompt });
+
         if (mode === 'chat') {
-            return { model, messages: [{ role: 'user', content: prompt }], stream: true };
+            return { 
+                model, 
+                messages, 
+                stream: true
+            };
         }
         if (mode === 'generate') {
-            return { model, prompt, stream: true };
+            return { model, prompt, system: systemPrompt, stream: true };
         }
         throw new Error("Wrong mode given.");
     }

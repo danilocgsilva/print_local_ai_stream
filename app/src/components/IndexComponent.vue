@@ -66,7 +66,14 @@
             ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
             : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
       ></textarea>
-      <SettingsComponent :isDark="isDark" :show="showSettings" :mode="apiMode" @toggle="toggleSettings" @update:mode="apiMode = $event" />
+      <SettingsComponent 
+        :isDark="isDark" 
+        :show="showSettings" 
+        :mode="apiMode" 
+        :systemPrompt="systemPrompt" 
+        @toggle="toggleSettings" 
+        @update:mode="apiMode = $event" 
+        @update:systemPrompt="systemPrompt = $event" />
       <div class="flex gap-2">
         <button
           @click="ask"
@@ -130,8 +137,9 @@ const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
 const requestError = ref<string | null>(null);
-const showSettings = ref(true);
+const showSettings = ref(false);
 const apiMode = ref<ApiMode>('chat');
+const systemPrompt = ref('');
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
@@ -178,7 +186,7 @@ async function ask(): Promise<void> {
   requestError.value = null;
 
   try {
-    const response = await ollamClient.getResponse(apiMode.value, selectedModel.value, inputText.value);
+    const response = await ollamClient.getResponse(apiMode.value, selectedModel.value, inputText.value, systemPrompt.value);
 
     if (!response.ok) {
       const data = await response.json();

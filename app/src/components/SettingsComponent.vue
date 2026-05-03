@@ -22,7 +22,8 @@
           </div>
 
           <textarea
-            v-model="systemPrompt"
+            :value="systemPrompt"
+            @input="$emit('update:systemPrompt', ($event.target as HTMLTextAreaElement).value)"
             placeholder="Type system prompt here..."
             class="w-full h-24 p-3 rounded-lg border resize-y focus:outline-none focus:ring-2 transition-colors"
             :class="isDark
@@ -48,8 +49,6 @@
 import { ApiMode } from '../OllamaData';
 import { ref } from 'vue';
 
-const systemPrompt = ref('');
-
-defineProps<{ isDark: boolean; show: boolean; mode: ApiMode }>();
-defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void }>();
+defineProps<{ isDark: boolean; show: boolean; mode: ApiMode; systemPrompt: string }>();
+defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void; (e: 'update:systemPrompt', value: string): void }>();
 </script>
