@@ -4,3 +4,5 @@ app/.wget-hsts
 app/.env
 app/.gnupg/**/*
 .env
+app/.claude/**/*
+app/.claude.json

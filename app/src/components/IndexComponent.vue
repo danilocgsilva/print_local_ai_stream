@@ -96,6 +96,7 @@
       <div v-if="loading" class="w-full h-1 rounded overflow-hidden" :class="isDark ? 'bg-dark-border' : 'bg-light-muted'">
         <div class="h-full w-1/3 rounded animate-progress" :class="isDark ? 'bg-dark-subtle' : 'bg-light-subtle'"></div>
       </div>
+      <p v-if="askDate" class="text-xs" :class="isDark ? 'text-dark-subtle' : 'text-gray-400'">{{ askDate }}</p>
       <div
         v-if="requestError"
         class="flex items-start gap-2 px-3 py-2 rounded-lg border text-sm"
@@ -137,6 +138,7 @@ const selectedModel = ref('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
 const requestError = ref<string | null>(null);
+const askDate = ref<string | null>(null);
 const showSettings = ref(false);
 const apiMode = ref<ApiMode>('chat');
 const systemPrompt = ref('');
@@ -179,14 +181,33 @@ function cancel(): void {
   ollamClient.abort();
 }
 
+function rendersDate(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}${minutes}${seconds}`;
+}
+
 async function ask(): Promise<void> {
   if (!inputText.value.trim() || loading.value) return;
   loading.value = true;
   outputText.value = '';
   requestError.value = null;
 
+  askDate.value = rendersDate();
+
   try {
-    const response = await ollamClient.getResponse(apiMode.value, selectedModel.value, inputText.value, systemPrompt.value);
+    const response = await ollamClient.getResponse(
+      apiMode.value, 
+      selectedModel.value, 
+      inputText.value, 
+      systemPrompt.value
+    );
 
     if (!response.ok) {
       const data = await response.json();
