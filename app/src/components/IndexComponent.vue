@@ -156,6 +156,7 @@ const apiMode = ref<ApiMode>('chat');
 const systemPrompt = ref('');
 const copied = ref(false);
 const answered = ref(false);
+const aborted = ref(false);
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
@@ -210,6 +211,8 @@ function toggleTheme(): void {
 
 function cancel(): void {
   ollamClient.abort();
+  answered.value = false;
+  aborted.value = true;
 }
 
 function rendersDate(): string {
@@ -273,7 +276,8 @@ async function ask(): Promise<void> {
   } finally {
     loading.value = false;
     ollamClient.cleanAbord();
-    if (!requestError.value) answered.value = true;
+    if (!requestError.value && !aborted.value) answered.value = true;
+    aborted.value = false;
   }
 }
 </script>
