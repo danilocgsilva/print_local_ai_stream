@@ -23,12 +23,17 @@
 
           <textarea
             :value="systemPrompt"
+            :readonly="loading"
             @input="$emit('update:systemPrompt', ($event.target as HTMLTextAreaElement).value)"
             placeholder="Type system prompt here..."
             class="w-full h-24 p-3 rounded-lg border resize-y focus:outline-none focus:ring-2 transition-colors"
-            :class="isDark
-              ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
-              : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
+            :class="loading
+              ? isDark
+                ? 'bg-dark-bg text-dark-subtle border-dark-border cursor-default placeholder-dark-subtle'
+                : 'bg-light-surface text-gray-500 border-light-strong cursor-default placeholder-light-subtle'
+              : isDark
+                ? 'bg-dark-surface text-dark-subtle border-dark-border focus:ring-dark-muted placeholder-dark-subtle'
+                : 'bg-light-bg text-gray-800 border-light-strong focus:ring-light-subtle placeholder-light-subtle'"
           ></textarea>
         </div>
       </div>
@@ -49,6 +54,6 @@
 import { ApiMode } from '../OllamaData';
 import { ref } from 'vue';
 
-defineProps<{ isDark: boolean; show: boolean; mode: ApiMode; systemPrompt: string }>();
+defineProps<{ isDark: boolean; show: boolean; mode: ApiMode; systemPrompt: string; loading: boolean }>();
 defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void; (e: 'update:systemPrompt', value: string): void }>();
 </script>

@@ -55,10 +55,10 @@
       </div>
       <textarea
         v-model="inputText"
-        :readonly="!!modelsError || models.length === 0"
+        :readonly="!!modelsError || models.length === 0 || loading || answered"
         placeholder="Type here..."
         class="w-full h-60 min-h-40 p-3 rounded-lg border resize-y focus:outline-none focus:ring-2 transition-colors"
-        :class="!!modelsError || models.length === 0
+        :class="!!modelsError || models.length === 0 || loading || answered
           ? isDark
             ? 'bg-dark-bg text-dark-subtle border-dark-border cursor-default placeholder-dark-subtle'
             : 'bg-light-surface text-gray-500 border-light-strong cursor-default placeholder-light-subtle'
@@ -70,7 +70,8 @@
         :isDark="isDark" 
         :show="showSettings" 
         :mode="apiMode" 
-        :systemPrompt="systemPrompt" 
+        :systemPrompt="systemPrompt"
+        :loading="loading || answered"
         @toggle="toggleSettings" 
         @update:mode="apiMode = $event" 
         @update:systemPrompt="systemPrompt = $event" />
@@ -82,7 +83,7 @@
           :class="isDark
             ? 'bg-dark-muted text-dark-subtle hover:bg-dark-border'
             : 'bg-light-subtle text-gray-800 hover:bg-light-muted'"
-        >{{ loading ? 'Answering...' : 'Ask' }}</button>
+        >{{ loading ? 'Answering...' : answered ? 'Ask again' : 'Ask' }}</button>
         <button
           @click="cancel"
           :disabled="!loading"
@@ -116,6 +117,17 @@
           ? 'bg-dark-bg text-dark-subtle border-dark-border placeholder-dark-subtle'
           : 'bg-light-surface text-gray-500 border-light-strong placeholder-light-subtle'"
       ></textarea>
+      <div class="flex justify-end">
+        <button
+          @click="copyToClipboard"
+          :disabled="!outputText"
+          title="Copy to clipboard"
+          class="px-3 py-1.5 rounded-lg text-sm border transition-colors disabled:opacity-30"
+          :class="isDark
+            ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
+            : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
+        >{{ copied ? '✓ Copied' : '⎘ Copy' }}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -142,6 +154,8 @@ const askDate = ref<string | null>(null);
 const showSettings = ref(false);
 const apiMode = ref<ApiMode>('chat');
 const systemPrompt = ref('');
+const copied = ref(false);
+const answered = ref(false);
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
@@ -168,6 +182,23 @@ watch(serverDns, (val) => {
   dnsDebounce = setTimeout(fetchModels, 3000);
 });
 
+async function copyToClipboard(): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(outputText.value);
+  } catch {
+    const el = document.createElement('textarea');
+    el.value = outputText.value;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+  copied.value = true;
+  setTimeout(() => copied.value = false, 2000);
+}
+
 function toggleSettings(): void {
   showSettings.value = !showSettings.value;
 }
@@ -190,10 +221,18 @@ function rendersDate(): string {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
-  return `${year}-${month}-${day} ${hours}${minutes}${seconds}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}s`;
 }
 
 async function ask(): Promise<void> {
+  if (answered.value) {
+    inputText.value = '';
+    outputText.value = '';
+    requestError.value = null;
+    askDate.value = null;
+    answered.value = false;
+    return;
+  }
   if (!inputText.value.trim() || loading.value) return;
   loading.value = true;
   outputText.value = '';
@@ -233,7 +272,8 @@ async function ask(): Promise<void> {
     if ((e as Error).name !== 'AbortError') throw e;
   } finally {
     loading.value = false;
-    ollamClient.cleanAbord()
+    ollamClient.cleanAbord();
+    if (!requestError.value) answered.value = true;
   }
 }
 </script>
