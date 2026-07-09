@@ -109,33 +109,19 @@
         <span>{{ requestError }}</span>
       </div>
 
-
-
-
-
       <AnswerAreaComponent :isDark="isDark" :outputText="outputText" />
 
 
 
 
 
-      <div class="flex justify-end">
-        <button
-          @click="copyToClipboard"
-          :disabled="!outputText"
-          title="Copy to clipboard"
-          class="px-3 py-1.5 rounded-lg text-sm border transition-colors disabled:opacity-30"
-          :class="isDark
-            ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
-            : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
-        >{{ copied ? '✓ Copied' : '⎘ Copy' }}</button>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import OllamaData from '../OllamaData';
 import OllamaClient from '../OllamaClient';
 import SettingsComponent from './SettingsComponent.vue';
@@ -147,9 +133,9 @@ const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 const inputText = ref('');
 const outputText = ref('');
 const isDark = ref(document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark');
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const serverDns = ref(localStorage.getItem('serverDns') ?? 'localhost:11434');
-const selectedModel = ref('');
+const selectedModel = ref<string>('');
 const models = ref<string[]>([]);
 const modelsError = ref<string | null>(null);
 const requestError = ref<string | null>(null);
@@ -157,12 +143,31 @@ const askDate = ref<string | null>(null);
 const showSettings = ref(false);
 const apiMode = ref<ApiMode>('chat');
 const systemPrompt = ref('');
-const copied = ref(false);
-const answered = ref(false);
-const aborted = ref(false);
+const answered = ref<boolean>(false);
+const aborted = ref<boolean>(false);
+const baseTitle: string = document.title;
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
+
+let titleInterval: ReturnType<typeof setInterval> | null = null;
+let dotCount = 0;
+
+function startTitleAnimaion(): void {
+  dotCount = 0;
+  titleInterval = setInterval(() => {
+    dotCount = (dotCount % 10) + 1;
+    document.title = `Answering${'.'.repeat(dotCount)}`;
+  }, 1000);
+}
+
+function stopTitleAnimation(): void {
+  if (titleInterval !== null) {
+    clearInterval(titleInterval);
+    titleInterval = null;
+  }
+  document.title = baseTitle;
+}
 
 async function fetchModels(): Promise<void> {
   try {
@@ -180,28 +185,24 @@ async function fetchModels(): Promise<void> {
 onMounted(fetchModels);
 
 let dnsDebounce: ReturnType<typeof setTimeout>;
+
 watch(serverDns, (val) => {
   localStorage.setItem('serverDns', val);
   clearTimeout(dnsDebounce);
   dnsDebounce = setTimeout(fetchModels, 3000);
 });
 
-async function copyToClipboard(): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(outputText.value);
-  } catch {
-    const el = document.createElement('textarea');
-    el.value = outputText.value;
-    el.style.position = 'fixed';
-    el.style.opacity = '0';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+watch(loading, (isLoading: boolean) => {
+  if (isLoading) {
+    startTitleAnimaion();
+  } else {
+    stopTitleAnimation();
   }
-  copied.value = true;
-  setTimeout(() => copied.value = false, 2000);
-}
+});
+
+onBeforeUnmount(() => {
+  stopTitleAnimation();
+})
 
 function toggleSettings(): void {
   showSettings.value = !showSettings.value;
@@ -239,7 +240,11 @@ async function ask(): Promise<void> {
     answered.value = false;
     return;
   }
-  if (!inputText.value.trim() || loading.value) return;
+
+  if (!inputText.value.trim() || loading.value) {
+    return;
+  }
+
   loading.value = true;
   outputText.value = '';
   requestError.value = null;
@@ -259,7 +264,10 @@ async function ask(): Promise<void> {
       requestError.value = data.error ?? 'Unknown error';
       return;
     }
-    if (!response.body) return;
+    if (!response.body) {
+      return;
+    }
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 

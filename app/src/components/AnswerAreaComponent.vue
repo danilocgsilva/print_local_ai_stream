@@ -5,13 +5,41 @@
       ? 'bg-dark-bg text-dark-subtle border-dark-border placeholder-dark-subtle'
       : 'bg-light-surface text-gray-500 border-light-strong placeholder-light-subtle'"></textarea>
 
+  <div class="flex justify-end">
+    <button @click="copyToClipboard" :disabled="!outputText" title="Copy to clipboard"
+      class="px-3 py-1.5 rounded-lg text-sm border transition-colors disabled:opacity-30" :class="isDark
+        ? 'bg-dark-surface text-dark-subtle border-dark-border hover:bg-dark-muted'
+        : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'">{{ copied ? '✓ Copied' : '⎘Copy' }}</button>
+  </div>
+
 </template>
 
 <script setup lang="ts">
 
-defineProps<{
+import { ref } from 'vue';
+
+const props = defineProps<{
   outputText: string,
   isDark: boolean
 }>();
+
+const copied = ref(false);
+
+async function copyToClipboard(): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(props.outputText);
+  } catch {
+    const el = document.createElement('textarea');
+    el.value = props.outputText;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+  copied.value = true;
+  setTimeout(() => copied.value = false, 2000);
+}
 
 </script>
