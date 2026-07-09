@@ -13,9 +13,12 @@
             : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
         >{{ isDark ? '☀ Light' : '☾ Dark' }}</button>
       </div>
-      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Ollama Chat</h1>
+      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Chatooha Chat</h1>
       <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
         Put a question and ask. It will access the local Ollama server to answer.
+      </p>
+      <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
+        Or connect to the Alooha Proxy, that behaves exactly the same as Ollama and also stores data about server performance and questions history.
       </p>
       <div class="flex items-end gap-2">
         <label class="flex-1 min-w-0 flex flex-col gap-1">
@@ -124,6 +127,7 @@
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import OllamaData from '../OllamaData';
 import OllamaClient from '../OllamaClient';
+import DocumentTitleDynamic from '../DocumentTitleDynamic';
 import SettingsComponent from './SettingsComponent.vue';
 import { ApiMode } from '../OllamaData';
 import AnswerAreaComponent from './AnswerAreaComponent.vue';
@@ -145,29 +149,12 @@ const apiMode = ref<ApiMode>('chat');
 const systemPrompt = ref('');
 const answered = ref<boolean>(false);
 const aborted = ref<boolean>(false);
-const baseTitle: string = document.title;
 
 const ollama = new OllamaData(serverDns.value);
 const ollamClient = new OllamaClient(ollama);
+const documentTitleDynamic = new DocumentTitleDynamic(document.title);
 
-let titleInterval: ReturnType<typeof setInterval> | null = null;
-let dotCount = 0;
-
-function startTitleAnimaion(): void {
-  dotCount = 0;
-  titleInterval = setInterval(() => {
-    dotCount = (dotCount % 10) + 1;
-    document.title = `Answering${'.'.repeat(dotCount)}`;
-  }, 1000);
-}
-
-function stopTitleAnimation(): void {
-  if (titleInterval !== null) {
-    clearInterval(titleInterval);
-    titleInterval = null;
-  }
-  document.title = baseTitle;
-}
+let dnsDebounce: ReturnType<typeof setTimeout>;
 
 async function fetchModels(): Promise<void> {
   try {
@@ -184,8 +171,6 @@ async function fetchModels(): Promise<void> {
 
 onMounted(fetchModels);
 
-let dnsDebounce: ReturnType<typeof setTimeout>;
-
 watch(serverDns, (val) => {
   localStorage.setItem('serverDns', val);
   clearTimeout(dnsDebounce);
@@ -194,14 +179,14 @@ watch(serverDns, (val) => {
 
 watch(loading, (isLoading: boolean) => {
   if (isLoading) {
-    startTitleAnimaion();
+    documentTitleDynamic.start();
   } else {
-    stopTitleAnimation();
+    documentTitleDynamic.stop();
   }
 });
 
 onBeforeUnmount(() => {
-  stopTitleAnimation();
+  documentTitleDynamic.stop();
 })
 
 function toggleSettings(): void {
@@ -291,4 +276,5 @@ async function ask(): Promise<void> {
     aborted.value = false;
   }
 }
+
 </script>
