@@ -108,15 +108,17 @@
         <span>⚠</span>
         <span>{{ requestError }}</span>
       </div>
-      <textarea
-        :value="outputText"
-        readonly
-        placeholder="Output will appear here..."
-        class="w-full h-96 p-3 rounded-lg border resize-none cursor-default transition-colors"
-        :class="isDark
-          ? 'bg-dark-bg text-dark-subtle border-dark-border placeholder-dark-subtle'
-          : 'bg-light-surface text-gray-500 border-light-strong placeholder-light-subtle'"
-      ></textarea>
+
+
+
+
+
+      <AnswerAreaComponent :isDark="isDark" :outputText="outputText" />
+
+
+
+
+
       <div class="flex justify-end">
         <button
           @click="copyToClipboard"
@@ -138,6 +140,7 @@ import OllamaData from '../OllamaData';
 import OllamaClient from '../OllamaClient';
 import SettingsComponent from './SettingsComponent.vue';
 import { ApiMode } from '../OllamaData';
+import AnswerAreaComponent from './AnswerAreaComponent.vue';
 
 const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`;
 

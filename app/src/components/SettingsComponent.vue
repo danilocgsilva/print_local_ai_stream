@@ -52,8 +52,13 @@
 
 <script setup lang="ts">
 import { ApiMode } from '../OllamaData';
-import { ref } from 'vue';
 
-defineProps<{ isDark: boolean; show: boolean; mode: ApiMode; systemPrompt: string; loading: boolean }>();
+defineProps<{ 
+  isDark: boolean; 
+  show: boolean; 
+  mode: ApiMode;
+  systemPrompt: string;
+  loading: boolean
+}>();
 defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void; (e: 'update:systemPrompt', value: string): void }>();
 </script>
