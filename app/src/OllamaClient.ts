@@ -20,15 +20,20 @@ class OllamaClient {
         return this;
     }
 
-    public async getResponse(mode: ApiMode, model: string, prompt: string, systemPrompt = '') {
+    public async getResponse(
+        mode: ApiMode, 
+        model: string, 
+        prompt: string, 
+        systemPrompt = ''
+    ): Promise<Response> {
         this.abortController = new AbortController();
         const response = await fetch(this.ollamaData.getFullAddress(mode), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(
-            this.ollamaData.getQueryObject(mode, model, prompt, systemPrompt)
-          ),
-          signal: this.abortController.signal,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(
+                this.ollamaData.getQueryObject(mode, model, prompt, systemPrompt)
+            ),
+            signal: this.abortController.signal,
         });
 
         return response;
