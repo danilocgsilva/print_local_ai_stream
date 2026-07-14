@@ -1,8 +1,8 @@
 services:
-  print_stream_local_ollama:
+  chatooha_chat:
     build:
       context: .
-    container_name: print_stream_local_ollama
+    container_name: chatooha_chat
     volumes:
       - './app:/app'
     working_dir: /app
