@@ -1,7 +1,7 @@
 {
     "name": "print_local_ai_stream",
     "dockerComposeFile": "../docker-compose.yml",
-    "service": "print_stream_local_ollama",
+    "service": "chatooha_chat",
     "workspaceFolder": "/app",
     "forwardPorts": [8099]
 }
