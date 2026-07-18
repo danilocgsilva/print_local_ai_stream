@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Index from '../components/IndexComponent.vue'
-import Stats from '../routes/StatsComponent.vue'
+import Index from '../pages/IndexComponent.vue'
+import Stats from '../pages/StatsComponent.vue'
 
 const routes = [
     {
