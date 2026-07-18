@@ -125,11 +125,11 @@
 <script setup lang="ts">
 
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
-import OllamaData from '../OllamaData';
-import OllamaClient from '../OllamaClient';
-import DocumentTitleDynamic from '../DocumentTitleDynamic';
+import OllamaData from '../domain/OllamaData';
+import OllamaClient from '../domain/OllamaClient';
+import DocumentTitleDynamic from '../domain/DocumentTitleDynamic';
 import SettingsComponent from './SettingsComponent.vue';
-import { ApiMode } from '../OllamaData';
+import { ApiMode } from '../domain/OllamaData';
 import AnswerAreaComponent from './AnswerAreaComponent.vue';
 
 const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`;

@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ApiMode } from '../OllamaData';
+import { ApiMode } from '../domain/OllamaData';
 
 defineProps<{ 
   isDark: boolean; 
