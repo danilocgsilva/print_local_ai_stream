@@ -1,5 +1,5 @@
 {
-    "name": "print_local_ai_stream",
+    "name": "chatooha_chat",
     "dockerComposeFile": "../docker-compose.yml",
     "service": "chatooha_chat",
     "workspaceFolder": "/app",
