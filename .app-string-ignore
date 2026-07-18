@@ -21,3 +21,13 @@
 ^/app/postcss.config.js
 ^/app/.env.example
 ^/app/.eslintrc.js
+^/app/.vscode-server
+^/app/.local
+^/app/.aws
+^/app/.cache
+^/app/.vscodium-server
+^/app/.dotnet
+^/app/.ssh
+^/app/.wget-hsts
+^/app/.env
+^/app/.gitconfig
