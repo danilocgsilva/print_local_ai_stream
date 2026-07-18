@@ -1,16 +1,10 @@
 <template>
-  <IndexComponent />
+  <router-view />
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import IndexComponent from './components/IndexComponent.vue';
 
-@Options({
-  components: {
-    IndexComponent,
-  },
-})
 export default class App extends Vue {}
 </script>
 

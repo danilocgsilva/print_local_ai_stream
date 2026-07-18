@@ -111,13 +111,7 @@
         <span>⚠</span>
         <span>{{ requestError }}</span>
       </div>
-
       <AnswerAreaComponent :isDark="isDark" :outputText="outputText" />
-
-
-
-
-
     </div>
   </div>
 </template>
