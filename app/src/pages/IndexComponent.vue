@@ -13,7 +13,13 @@
             : 'bg-light-surface text-gray-700 border-light-strong hover:bg-light-muted'"
         >{{ isDark ? '☀ Light' : '☾ Dark' }}</button>
       </div>
-      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Chatooha Chat</h1>
+
+      <MenuComponent :isDark="isDark"></MenuComponent>
+
+      <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">
+        Chatooha Chat
+      </h1>
+
       <p class="text-left" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">
         Put a question and ask. It will access the local Ollama server to answer.
       </p>
@@ -125,6 +131,7 @@ import DocumentTitleDynamic from '../domain/DocumentTitleDynamic';
 import SettingsComponent from './../components/SettingsComponent.vue';
 import { ApiMode } from '../domain/OllamaData';
 import AnswerAreaComponent from './../components/AnswerAreaComponent.vue';
+import MenuComponent from './../components/MenuComponent.vue';
 
 const arrowSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23888' stroke-width='2' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`;
 
