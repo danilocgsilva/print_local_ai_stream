@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { ApiMode } from '../domain/OllamaData';
 
 defineProps<{ 
@@ -60,5 +61,7 @@ defineProps<{
   systemPrompt: string;
   loading: boolean
 }>();
+
 defineEmits<{ (e: 'toggle'): void; (e: 'update:mode', value: ApiMode): void; (e: 'update:systemPrompt', value: string): void }>();
+
 </script>

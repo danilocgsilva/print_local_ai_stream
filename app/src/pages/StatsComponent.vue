@@ -15,6 +15,7 @@
       <h1 class="text-3xl font-bold text-center" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">
         Chatooha Chat
       </h1>
+      <StatsTableComponent :isDark="isDark"></StatsTableComponent>
     </div>
   </div>
 </template>
@@ -23,6 +24,7 @@
 
 import { ref } from 'vue';
 import MenuComponent from './../components/MenuComponent.vue';
+import StatsTableComponent from './../components/StatsTableComponent.vue';
 
 const isDark = ref(document.cookie.split('; ').find(r => r.startsWith('theme='))?.split('=')[1] === 'dark');
 
