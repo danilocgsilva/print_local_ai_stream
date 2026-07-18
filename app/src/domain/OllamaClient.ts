@@ -1,4 +1,5 @@
 import OllamaData, { ApiMode } from "./OllamaData";
+import { StatItem } from "types/StatItem";
 
 class OllamaClient {
     private ollamaData: OllamaData;
@@ -6,6 +7,27 @@ class OllamaClient {
 
     constructor(ollamaData: OllamaData) {
         this.ollamaData = ollamaData;
+    }
+
+    // public async getStatistics(): Promise<string[]> {
+    //     const res = await fetch(this.ollamaData.getFullAddressOllamaStatistics());
+    //     const data = await res.json();
+    // }
+
+    public async getStatistics(): Promise<StatItem[]> {
+        const res = await fetch(this.ollamaData.getFullAddressOllamaStatistics());
+        
+        if (!res.ok) {
+            throw new Error(`Failed to fetch statistics: ${res.status} ${res.statusText}`);
+        }
+
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+            return data as StatItem[];
+        }
+
+        return data;
     }
 
     public async getModels(): Promise<string[]> {

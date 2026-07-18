@@ -7,6 +7,7 @@ class OllamaData {
     private generatePath = 'api/generate';
     private chatPath = 'api/chat';
     private tagsPath = 'api/tags';
+    private ollamaStatistics = 'alooha_api/stats';
 
     constructor(serverDns: string) {
         this.serverDns = serverDns;
@@ -22,6 +23,10 @@ class OllamaData {
 
     public getFullAddressTags(): string {
         return `http://${this.serverDns}/${this.tagsPath}`;
+    }
+
+    public getFullAddressOllamaStatistics(): string {
+        return `http://${this.serverDns}/${this.ollamaStatistics}`;
     }
 
     public updateServerDns(serverDns: string): OllamaData {

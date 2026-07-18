@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen transition-colors" :class="isDark ? 'bg-dark-bg' : 'bg-light-bg'">
-
     <div class="flex flex-col gap-4 p-12 max-w-5xl mx-auto w-full">
       <div class="flex justify-end">
         <button
