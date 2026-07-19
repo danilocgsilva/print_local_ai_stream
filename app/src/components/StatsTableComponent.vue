@@ -81,7 +81,10 @@ const fetchStats = async () => {
     
     const ollamaClient = new OllamaClient(new OllamaData(serverDns.value));
 
-    stats.value = await ollamaClient.getStatistics();
+    // stats.value = await ollamaClient.getStatistics();
+    // stats.value = await ollamaClient.getStatistics();
+    const response = await ollamaClient.getStatistics();
+    stats.value = response.message || [];
     error.value = null;
     
   } catch (err) {
