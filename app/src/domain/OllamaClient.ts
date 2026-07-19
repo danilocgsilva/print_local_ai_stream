@@ -1,5 +1,6 @@
 import OllamaData, { ApiMode } from "./OllamaData";
 import { StatItem } from "types/StatItem";
+import { ApiStatResponse } from "types/ApiStatResponse";
 
 class OllamaClient {
     private ollamaData: OllamaData;
@@ -9,11 +10,6 @@ class OllamaClient {
         this.ollamaData = ollamaData;
     }
 
-    // public async getStatistics(): Promise<string[]> {
-    //     const res = await fetch(this.ollamaData.getFullAddressOllamaStatistics());
-    //     const data = await res.json();
-    // }
-
     public async getStatistics(): Promise<StatItem[]> {
         const res = await fetch(this.ollamaData.getFullAddressOllamaStatistics());
         
@@ -21,13 +17,16 @@ class OllamaClient {
             throw new Error(`Failed to fetch statistics: ${res.status} ${res.statusText}`);
         }
 
-        const data = await res.json();
+        const data: ApiStatResponse = await res.json();
 
-        if (Array.isArray(data)) {
-            return data as StatItem[];
+        if (data && Array.isArray(data.message)) {
+            return data.message.map((item: { count: string, model: string }) => ({
+                count: parseInt(item.count, 10),
+                model: item.model
+            })) as StatItem[];
         }
 
-        return data;
+        throw new Error('Invalid response format');
     }
 
     public async getModels(): Promise<string[]> {

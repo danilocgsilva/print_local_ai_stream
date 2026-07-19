@@ -50,41 +50,13 @@ defineProps<{
   isDark: boolean;
 }>();
 
-// const generateSampleData = (): StatItem[] => {
-//   const models = [
-//     'qwen3-coder:30b', 'qwen2.5-coder:7b', 'gemma3:4b', 
-//     'codellama:13b', 'gemma4:12b', 'deepseek-r1:7b',
-//     'deepseek-coder:6.7b', 'deepseek-r1:14b', 'mdq100/qwen3.5-coder:35b',
-//     'phi3:3.8b', 'llama3.1:8b', 'gpt-oss:20b', 'devstral-small-2:24b',
-//     'deepseek-v2:16b', 'deepseek-coder-v2:16b', 'mistral:latest',
-//     'codegemma:7b', 'qwen2.5-coder:32b', 'starcoder:15b',
-//     'sorc/qwen3.5-claude-4.6-opus:latest', 'codellama:7b-instruct',
-//     'codegemma:code', 'starcoder:3b', 'cryptidbleh/gemma4-claude-sonnet-4.6:latest',
-//     'qwen3.6:27b', 'codegemma:7b-code'
-//   ];
-  
-//   return Array.from({ length: 25 }, (_, i) => ({
-//     count: Math.floor(Math.random() * 200) + 1,
-//     model: models[i % models.length]
-//   })).sort((a, b) => b.count - a.count);
-// };
-
 const fetchStats = async () => {
   try {
     loading.value = true;
-    // Replace with actual API call
-    // const response = await fetch('/api/stats');
-    // const data = await response.json();
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
     
     const ollamaClient = new OllamaClient(new OllamaData(serverDns.value));
 
-    // stats.value = await ollamaClient.getStatistics();
-    // stats.value = await ollamaClient.getStatistics();
-    const response = await ollamaClient.getStatistics();
-    stats.value = response.message || [];
+    stats.value = await ollamaClient.getStatistics();
     error.value = null;
     
   } catch (err) {
