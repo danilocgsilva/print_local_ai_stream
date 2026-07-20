@@ -27,3 +27,5 @@ After it is completely compiled, you can access `http://localhost:8099` and try.
 * DevContainer recipe
 * Ready to VS Codium
 * HMR working, even in remote machine
+* Vue router
+* Style with raw css for all pages (`app\src\tailwind.css`)
