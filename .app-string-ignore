@@ -9,11 +9,9 @@
 ^/.app-string-ignore
 ^/.env
 ^/README.md
-^/docker-compose.yml
 ^/app/README.md
 ^/.devcontainer
 ^/app/.bash_history
-^/app/package.json
 ^/app/.env.example
 ^/app/.eslintrc.js
 ^/app/.vscode-server

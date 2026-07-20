@@ -1,7 +1,7 @@
 <template>
   <div :class="['stats-container', { 'dark-mode': isDark }]">
     <div class="stats-container">
-      <h2 class="stats-title">Model Usage Statistics</h2>
+      <h2 class="stats-title font-bold" :class="isDark ? 'text-dark-subtle' : 'text-gray-800'">Model Usage Statistics</h2>
       
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
@@ -15,14 +15,14 @@
       <table v-else class="stats-table">
         <thead>
           <tr>
-            <th class="count-column">Count</th>
-            <th>Model Name</th>
+            <th class="count-column" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Count</th>
+            <th :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">Model Name</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in stats" :key="index">
-            <td class="count-cell">{{ item.count }}</td>
-            <td class="model-cell">{{ item.model }}</td>
+            <td class="count-cell" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">{{ item.count }}</td>
+            <td class="model-cell" :class="isDark ? 'text-dark-subtle' : 'text-gray-500'">{{ item.model }}</td>
           </tr>
         </tbody>
       </table>
@@ -85,13 +85,11 @@ onMounted(() => {
   margin-top: 0;
   margin-bottom: 1.5rem;
   font-size: 1.4rem;
-  color: var(--text-color);
 }
 
 .stats-table {
   width: 100%;
   border-collapse: collapse;
-  color: var(--text-color);
 }
 
 .stats-table thead {
@@ -102,7 +100,6 @@ onMounted(() => {
   padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 600;
-  color: var(--text-secondary-color);
 }
 
 .stats-table td {
@@ -117,7 +114,6 @@ onMounted(() => {
 
 .count-cell {
   font-weight: 600;
-  color: var(--accent-color);
 }
 
 .model-cell {
